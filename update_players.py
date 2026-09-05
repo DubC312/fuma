@@ -509,7 +509,7 @@ def main():
         p["rarity"]=rarity(int(p.get("rating") or 0))
         p["theme"]="fussball"; p["emoji"]="⚽"; p["color"]="#1f6f50"
         # predictable category order
-        order=["bundesliga","champions","europa","legenden"]
+        order=["bundesliga","champions","europa","restderwelt"]
         p["competitions"]=sorted(set(p.get("competitions",[])),key=lambda x:order.index(x) if x in order else 99)
 
     # Reuse existing cartoon / SportsDB data wherever possible.
@@ -520,7 +520,7 @@ def main():
 
     sportsdb_enrich(rows)
 
-    comp_order={"bundesliga":0,"champions":1,"europa":2,"legenden":3}
+    comp_order={"bundesliga":0,"champions":1,"europa":2,"restderwelt":3}
     def sortkey(p):
         cs=p.get("competitions") or ["zzz"]
         first=min([comp_order.get(c,9) for c in cs] or [9])
