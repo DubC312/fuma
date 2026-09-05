@@ -37,7 +37,7 @@ body::before{
   content:"";
   position:fixed;
   inset:0;
-  background:url("bg.jpeg") center/cover no-repeat;
+  background:url("bg.jpg") center/cover no-repeat;
   opacity:.32;
   z-index:-2;
 }
@@ -94,6 +94,19 @@ button.active{background:var(--green-deep);box-shadow:0 0 0 3px #fff8 inset}
 .choice-btn{min-width:110px;background:#2a7955}
 .duration-btn{min-width:105px;background:#526f60}
 .choice-btn.active,.duration-btn.active{background:#092f20}
+
+/* Punkt vor Strich und Mix zusätzlich golden hervorheben */
+.choice-btn[data-op="punkt"],
+.choice-btn[data-op="mix"]{
+  border:3px solid #d4af37;
+  box-shadow:0 0 0 1px rgba(255,235,150,.45),0 3px 10px rgba(120,85,0,.22);
+}
+
+.choice-btn[data-op="punkt"].active,
+.choice-btn[data-op="mix"].active{
+  border-color:#ffd966;
+  box-shadow:0 0 0 2px rgba(255,217,102,.38),0 0 12px rgba(212,175,55,.45);
+}
 
 .status-row{
   display:grid;
@@ -218,8 +231,61 @@ button.active{background:var(--green-deep);box-shadow:0 0 0 3px #fff8 inset}
   box-shadow:0 12px 26px #0003;
   min-height:420px;
 }
-.card.Legend{background:linear-gradient(145deg,#35235b,#9a73c4,#e8c858);color:white}
-.card.Silver{background:linear-gradient(145deg,#b9c3c9,#f5f5f5,#9aa5ab)}
+.card.Legende{
+  color:white;
+  border:1px solid rgba(224,196,255,.62);
+  background:linear-gradient(135deg,#160d35 0%,#48216d 30%,#8652a8 56%,#35205f 78%,#160d35 100%);
+  box-shadow:0 12px 30px rgba(0,0,0,.42),0 0 18px rgba(232,200,88,.20),inset 0 0 24px rgba(255,255,255,.10);
+}
+
+/* Legenden: Hologramm + dezenter Glitzereffekt */
+.card.Legende::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:-45%;
+  width:auto;
+  left:-45%;
+  pointer-events:none;
+  background:linear-gradient(112deg,
+    transparent 31%,
+    rgba(113,220,255,.10) 39%,
+    rgba(255,255,255,.46) 46%,
+    rgba(255,190,246,.24) 51%,
+    rgba(255,220,126,.15) 56%,
+    transparent 66%);
+  opacity:.86;
+  animation:legendeHolo 4.8s ease-in-out infinite;
+}
+
+.card.Legende::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle at 14% 18%,rgba(255,255,255,.95) 0 1px,transparent 2px),
+    radial-gradient(circle at 72% 13%,rgba(255,225,151,.95) 0 1.2px,transparent 2.4px),
+    radial-gradient(circle at 88% 47%,rgba(235,207,255,.95) 0 1px,transparent 2.2px),
+    radial-gradient(circle at 27% 62%,rgba(255,255,255,.90) 0 1.1px,transparent 2.3px),
+    radial-gradient(circle at 61% 79%,rgba(255,231,167,.95) 0 1px,transparent 2.2px),
+    radial-gradient(circle at 39% 35%,rgba(222,190,255,.90) 0 .8px,transparent 2px);
+  animation:legendeComboSparkle 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes legendeHolo{
+  0%,20%{transform:translateX(-28%)}
+  70%,100%{transform:translateX(34%)}
+}
+@keyframes legendeComboSparkle{
+  0%{opacity:.12;filter:brightness(.85)}
+  30%{opacity:.72;filter:brightness(1.25)}
+  58%{opacity:.25;filter:brightness(.95)}
+  82%{opacity:.88;filter:brightness(1.4)}
+  100%{opacity:.42;filter:brightness(1.05)}
+}
+.card.Silber{background:linear-gradient(145deg,#b9c3c9,#f5f5f5,#9aa5ab)}
 .card.Bronze{background:linear-gradient(145deg,#a96536,#d6a16e,#8e512e);color:#fff}
 .top{display:flex;justify-content:space-between;align-items:flex-start;font-weight:900;font-size:28px}
 .rating-block{line-height:1}
@@ -452,6 +518,21 @@ body.meme67-shake .ipad-tip{
   margin-top:14px;
 }
 
+
+.source-note{
+  max-width:1050px;
+  margin:4px auto 18px;
+  padding:10px 14px;
+  text-align:center;
+  font-size:12px;
+  line-height:1.55;
+  color:rgba(255,255,255,.78);
+}
+.source-note a{
+  color:inherit;
+  text-decoration:underline;
+}
+
 </style>
 </head>
 
@@ -478,6 +559,7 @@ body.meme67-shake .ipad-tip{
         <button type="button" class="choice-btn" data-op="sub">Minus</button>
         <button type="button" class="choice-btn" data-op="div">Geteilt</button>
         <button type="button" class="choice-btn" data-op="rest">Rest</button>
+        <button type="button" class="choice-btn" data-op="punkt">Punkt vor Strich</button>
         <button type="button" class="choice-btn" data-op="mix">Mix</button>
       </div>
 
@@ -499,7 +581,7 @@ body.meme67-shake .ipad-tip{
           <div class="status-card">Richtig<b id="totalCorrect">0</b></div>
           <div class="status-card">Karten<b id="cardsEarned">0</b></div>
         </div>
-        <div class="status-card" style="margin-top:10px">Bis zur nächsten Karte<b><span id="rewardProgress">0</span>/10</b></div>
+        <div class="status-card" style="margin-top:10px">Bis zur nächsten Karte<b><span id="rewardProgress">0</span>/<span id="rewardGoal">10</span></b></div>
         <div class="progress"><div id="bar"></div></div>
 
         <div class="task" id="task"></div>
@@ -574,7 +656,11 @@ function r(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 function initials(name){return name.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
 
 async function start(){
-  players=await (await fetch('players.json')).json();
+  const allPlayers=await (await fetch('players.json')).json();
+  // Cartoon-only: In der App erscheinen nur Spieler mit vorhandenem Cartoon.
+  // Die vollständige players.json bleibt erhalten, damit der wöchentliche Updater
+  // weiterhin alle EA-Spieler auf neue Werte und neu verfügbare Cartoons prüfen kann.
+  players=allPlayers.filter(p=>typeof p.cartoon==='string' && p.cartoon.trim()!=='');
   $('allCount').textContent=players.length;
   syncSelectionButtons();
   renderAlbum();
@@ -606,7 +692,7 @@ document.querySelectorAll('.duration-btn').forEach(btn=>{
 
 function pickTaskType(){
   if(currentOp!=='mix') return currentOp;
-  const types=['mul','add','sub','div','rest'];
+  const types=['mul','add','sub','div','rest','punkt'];
   return types[r(0,types.length-1)];
 }
 
@@ -630,7 +716,7 @@ function newTask(){
   attemptsForTask=0;
   $('rewardText').textContent='';
 
-  let a,b,symbol='',taskKey='',tries=0;
+  let a,b,c,symbol='',taskKey='',taskText='',tries=0;
 
   do{
     currentTaskType=pickTaskType();
@@ -639,16 +725,22 @@ function newTask(){
     if(currentTaskType==='mul'){
       a=r(1,10); b=r(1,10);
       currentAnswer=a*b; currentRemainder=0; symbol='×';
+      taskText=`${a} ${symbol} ${b} = ?`;
+      taskKey=`${currentTaskType}|${a}|${b}`;
     }
 
     if(currentTaskType==='add'){
       a=r(0,100); b=r(0,100-a);
       currentAnswer=a+b; currentRemainder=0; symbol='+';
+      taskText=`${a} ${symbol} ${b} = ?`;
+      taskKey=`${currentTaskType}|${a}|${b}`;
     }
 
     if(currentTaskType==='sub'){
       a=r(0,100); b=r(0,a);
       currentAnswer=a-b; currentRemainder=0; symbol='−';
+      taskText=`${a} ${symbol} ${b} = ?`;
+      taskKey=`${currentTaskType}|${a}|${b}`;
     }
 
     if(currentTaskType==='div'){
@@ -657,6 +749,8 @@ function newTask(){
       a=currentAnswer*b;
       currentRemainder=0;
       symbol='÷';
+      taskText=`${a} ${symbol} ${b} = ?`;
+      taskKey=`${currentTaskType}|${a}|${b}`;
     }
 
     if(currentTaskType==='rest'){
@@ -665,14 +759,67 @@ function newTask(){
       currentRemainder=r(1,b-1);
       a=currentAnswer*b+currentRemainder;
       symbol='÷';
+      taskText=`${a} ${symbol} ${b} = ?`;
+      taskKey=`${currentTaskType}|${a}|${b}`;
     }
 
-    taskKey=`${currentTaskType}|${a}|${b}`;
+    if(currentTaskType==='punkt'){
+      // Punkt vor Strich: Multiplikation ODER exakte Division aus dem kleinen 1x1.
+      // Das Endergebnis bleibt immer im Zahlenraum von 0 bis 100.
+      let valid=false;
+      while(!valid){
+        a=r(0,100);
+        const useDivision=Math.random()<0.5;
+        const plus=Math.random()<0.5;
+        const pointFirst=Math.random()<0.5;
+        let pointValue=0;
+        let pointText='';
+
+        if(useDivision){
+          // Beispiel: 48 ÷ 6 = 8. Dividend und Divisor stammen aus dem kleinen 1x1.
+          const quotient=r(1,10);
+          const divisor=r(1,10);
+          const dividend=quotient*divisor;
+          pointValue=quotient;
+          pointText=`${dividend} ÷ ${divisor}`;
+        }else{
+          b=r(1,10);
+          c=r(1,10);
+          pointValue=b*c;
+          pointText=`${b} × ${c}`;
+        }
+
+        if(plus){
+          currentAnswer=a+pointValue;
+          if(currentAnswer<=100){
+            taskText=pointFirst
+              ? `${pointText} + ${a} = ?`
+              : `${a} + ${pointText} = ?`;
+            valid=true;
+          }
+        }else if(pointFirst){
+          currentAnswer=pointValue-a;
+          if(currentAnswer>=0 && currentAnswer<=100){
+            taskText=`${pointText} − ${a} = ?`;
+            valid=true;
+          }
+        }else{
+          currentAnswer=a-pointValue;
+          if(currentAnswer>=0 && currentAnswer<=100){
+            taskText=`${a} − ${pointText} = ?`;
+            valid=true;
+          }
+        }
+      }
+      currentRemainder=0;
+      taskKey=`${currentTaskType}|${taskText}`;
+    }
+
     tries++;
   }while(taskKey===lastTaskKey && tries<50);
 
   lastTaskKey=taskKey;
-  $('task').textContent=`${a} ${symbol} ${b} = ?`;
+  $('task').textContent=taskText;
 
   $('answer').value='';
   $('restQuotient').value='';
@@ -687,12 +834,17 @@ function formatTime(sec){
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
+function rewardTarget(){
+  return (currentOp==='mix' || currentOp==='punkt') ? 5 : 10;
+}
+
 function updateUi(){
   $('timeLeft').textContent=formatTime(Math.max(0,secondsLeft));
   $('totalCorrect').textContent=totalCorrect;
   $('rewardProgress').textContent=rewardCounter;
+  $('rewardGoal').textContent=rewardTarget();
   $('cardsEarned').textContent=cardsEarned;
-  $('bar').style.width=(rewardCounter/10*100)+'%';
+  $('bar').style.width=(rewardCounter/rewardTarget()*100)+'%';
   $('ownedCount').textContent=owned.length;
 }
 
@@ -797,7 +949,7 @@ $('form').addEventListener('submit',e=>{
     $('msg').textContent='✅ Richtig!';
     updateUi();
 
-    if(rewardCounter>=10){
+    if(rewardCounter>=rewardTarget()){
       rewardCounter=0;
       cardsEarned++;
       updateUi();
@@ -827,34 +979,11 @@ $('form').addEventListener('submit',e=>{
 });
 
 async function info(p){
-  // Cartoon-URL aus players.json hat immer Vorrang.
+  // Cartoon-only-Version: keine normalen Spielerfotos als Fallback.
   if(p.cartoon){
     return {photo:p.cartoon,team:p.club||''};
   }
-
-  // Neue Cache-Version, damit alte normale Fotos nicht weiterverwendet werden.
-  let key='fm_info_cartoon_v1_'+p.id;
-  let cached=localStorage.getItem(key);
-  if(cached){
-    try{return JSON.parse(cached)}catch(e){}
-  }
-
-  try{
-    let d=await (await fetch(API+encodeURIComponent(p.search||p.name))).json();
-    let x=d.player&&d.player[0];
-
-    // Falls kein Cartoon in players.json vorhanden ist:
-    // normales TheSportsDB-Bild als Fallback.
-    let v={
-      photo:x?(x.strCutout||x.strThumb||''):'',
-      team:x?(x.strTeam||''):''
-    };
-
-    localStorage.setItem(key,JSON.stringify(v));
-    return v;
-  }catch(e){
-    return{photo:'',team:''}
-  }
+  return {photo:'',team:p.club||''};
 }
 
 function card(p){
@@ -982,7 +1111,7 @@ function renderAlbum(){
     {id:'bundesliga',icon:'🇩🇪',title:'Bundesliga'},
     {id:'champions',icon:'🏆',title:'Champions League'},
     {id:'europa',icon:'🟠',title:'Europa League'},
-    {id:'legenden',icon:'⭐',title:'Legenden'}
+    {id:'restderwelt',icon:'⭐',title:'Rest der Welt'}
   ];
 
   definitions.forEach(def=>{
