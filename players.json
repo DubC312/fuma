@@ -1,0 +1,13 @@
+[
+  {"id":1,"name":"Lionel Messi","club":"Inter Miami CF","competitions":["restderwelt"],"manual":true},
+  {"id":2,"name":"Cristiano Ronaldo","club":"Al Nassr","competitions":["restderwelt"],"manual":true},
+  {"id":3,"name":"Thomas Müller","club":"Vancouver Whitecaps FC","competitions":["restderwelt"],"manual":true},
+  {"id":4,"name":"Marco Reus","club":"LA Galaxy","competitions":["restderwelt"],"manual":true},
+  {"id":5,"name":"Neymar Jr","club":"Santos","competitions":["restderwelt"],"manual":true},
+  {"id":6,"name":"Sadio Mané","club":"Al Nassr","competitions":["restderwelt"],"manual":true}
+  {"id":7,"name":"Robert Lewandowski","club":"Chicago Fire","competitions":["restderwelt"],"manual":true}
+  {"id":8,"name":"Luis Suarez","club":"Inter Miami CF","competitions":["restderwelt"],"manual":true}
+  {"id":9,"name":"Hugo Lloris","club":"Los Angeles FC","competitions":["restderwelt"],"manual":true}
+  {"id":10,"name":"Heung-Min Son","club":"Los Angeles FC","competitions":["restderwelt"],"manual":true}
+  {"id":11,"name":"James Rodriguez","club":"Minnesota United","competitions":["restderwelt"],"manual":true}
+]
