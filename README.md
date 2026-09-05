@@ -1,22 +1,20 @@
 # ⚽ Fußball-Mathe-Trainer
 
-## Finale Version: Cartoon Only · Hologramm + Glitzer
+## Finale Version: Cartoon Only · 
 
 Ein browserbasierter Mathe-Trainer für Kinder, bei dem richtig gelöste
 Aufgaben mit sammelbaren Fußball-Spielerkarten belohnt werden.
 
 Diese Version ist die **endgültige Cartoon-only-Version**. In der App
-werden ausschließlich Spieler angezeigt, für die ein Cartoon-Bild
-vorhanden ist. Die Legenden-Karten besitzen einen besonderen **lila
-Hologramm- und Glitzereffekt**.
+werden ausschließlich Spieler angezeigt, für die ein lizenzfreies Cartoon-Bild in thesportsdb.com vorhanden ist. 
 
 ## ✨ Funktionen
 
 -   Matheaufgaben spielerisch üben
 -   Sammelbare Fußball-Spielerkarten als Belohnung
--   Karte nach jeweils 10 richtigen Antworten
+-   Karte nach jeweils 10 richtigen Antworten, bei den golden umrandeten Kategorien nach 5 richtigen Antworten.
 -   Ausgegraute, noch nicht gesammelte Karten im Album
--   Bundesliga, Champions League, Europa League und Legenden
+-   Bundesliga, Champions League, Europa League und Rest der Welt
 -   Spielerwerte auf Basis von EA SPORTS FC 27
 -   Cartoon-Spielerbilder von TheSportsDB
 -   Automatische Aktualisierung über GitHub Actions
@@ -103,13 +101,13 @@ Ein Spieler kann mehreren Kategorien angehören. Er behält dabei dieselbe
 interne ID, sodass eine gesammelte Karte nicht mehrfach gespeichert
 werden muss.
 
-## ⭐ Legenden
+## ⭐ Rest der Welt
 
-Manuell gepflegte Legenden können beispielsweise so in `players.json`
+Manuell gepflegte Spieler können beispielsweise so in `players.json`
 hinterlegt werden:
 
 ``` json
-{"name":"Spielername","club":"Verein","competitions":["legenden"],"manual":true}
+{"name":"Spielername","club":"Verein","competitions":["restderwelt"],"manual":true}
 ```
 
 Der Updater versucht anschließend, passende Werte und weitere Daten zu
@@ -129,10 +127,8 @@ ergänzen.
 └── .github/
     └── workflows/
         └── update-players.yml
-```
 
-Die finale Datei `index-cartoon-only-hologramm-glitzer.html` wird im
-veröffentlichten Repository als **`index.html`** verwendet.
+
 
 ## 🌐 GitHub Pages und iPad
 
@@ -162,11 +158,6 @@ werden, damit Geräte die neue Version zuverlässig laden.
 
 Spieler-Cartoonbilder stammen von **TheSportsDB**.
 
-Die App enthält den sichtbaren Hinweis:
-
-> Spieler-Cartoonbilder: TheSportsDB\
-> © Bild-/Artwork-Rechte bei den jeweiligen Rechteinhabern. TheSportsDB
-> wird als Bildquelle genannt.
 
 Die Cartoon-only-Version verwendet **keine normalen Spielerfotos als
 Ersatz**, wenn kein Cartoon vorhanden ist.
@@ -197,17 +188,3 @@ competitions.json
 update_players.py
 service-worker.js
 .github/workflows/update-players.yml
-```
-
-## ✅ Endgültige Version
-
-**Cartoon Only · Hologramm + Glitzer**
-
-Diese Version kombiniert ausschließlich Cartoon-Spielerkarten,
-automatisch aktualisierte Spielerdaten, vier Album-Kategorien, die
-gewählten Gold-/Silber-/Bronze-Designs sowie besondere lila
-Legenden-Karten mit kombiniertem Hologramm- und Glitzereffekt.
-
-Die vollständige Spielerdatenbank bleibt im Hintergrund erhalten, sodass
-Spieler mit neu verfügbaren Cartoons bei späteren Updates automatisch in
-der App erscheinen können.
