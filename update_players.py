@@ -387,12 +387,16 @@ def sportsdb_enrich(rows):
         tids=set([old_tid]) if old_tid else set()
 
         # Verifizierte IDs haben Vorrang.
-        override_sid=SPORTSDB_ID_OVERRIDES.get(wanted_norm)
+        override_sid = (
+            SPORTSDB_ID_OVERRIDES.get(norm(p.get("name") or ""))
+            or SPORTSDB_ID_OVERRIDES.get(norm(p.get("search") or ""))
+            or SPORTSDB_ID_OVERRIDES.get(wanted_norm)
+        )
         if override_sid:
             if str(p.get("sportsdbId") or "") != str(override_sid):
                 id_override_hits += 1
-            sid=override_sid
-            p["sportsdbId"]=override_sid
+            sid=str(override_sid)
+            p["sportsdbId"]=sid
 
         try:
             query=sportsdb_search_name(wanted)
@@ -609,7 +613,32 @@ def main():
         for k in ("sportsdbId","sportsdbTeamId","cartoon"):
             if old.get(k) and not p.get(k): p[k]=old[k]
 
+    # V7.2: Feste TheSportsDB-IDs nochmals unmittelbar vor dem Enrichment
+    # anwenden. So bleiben bekannte Zuordnungen unabhängig von Alias-/Suchlogik
+    # garantiert am Spieler hängen.
+    for p in rows:
+        fixed_sid = (
+            SPORTSDB_ID_OVERRIDES.get(norm(p.get("name") or ""))
+            or SPORTSDB_ID_OVERRIDES.get(norm(p.get("search") or ""))
+        )
+        if fixed_sid:
+            p["sportsdbId"] = str(fixed_sid)
+
     sportsdb_enrich(rows)
+
+    # Sicherheitsprüfung: Ein fester Override darf nach dem Enrichment niemals
+    # fehlen oder durch einen anderen Treffer ersetzt worden sein.
+    override_repairs=0
+    for p in rows:
+        fixed_sid = (
+            SPORTSDB_ID_OVERRIDES.get(norm(p.get("name") or ""))
+            or SPORTSDB_ID_OVERRIDES.get(norm(p.get("search") or ""))
+        )
+        if fixed_sid and str(p.get("sportsdbId") or "") != str(fixed_sid):
+            p["sportsdbId"] = str(fixed_sid)
+            override_repairs += 1
+    if override_repairs:
+        print(f"SportsDB-ID Sicherheitsreparaturen: {override_repairs}")
 
     comp_order={"bundesliga":0,"champions":1,"europa":2,"restderwelt":3}
     def sortkey(p):
