@@ -387,6 +387,8 @@ def sportsdb_enrich(rows):
         # Verifizierte IDs haben Vorrang.
         override_sid=SPORTSDB_ID_OVERRIDES.get(wanted_norm)
         if override_sid:
+            if str(p.get("sportsdbId") or "") != str(override_sid):
+                id_override_hits += 1
             sid=override_sid
             p["sportsdbId"]=override_sid
 
@@ -461,11 +463,33 @@ def sportsdb_enrich(rows):
             team_added+=1
 
     after=sum(1 for p in rows if p.get("cartoon"))
-    print(f"Cartoons: vorher {before}, neu Archiv {archive_added}, neu Team {team_added}, gesamt {after}/{len(rows)}")
-    missing=[p.get("name","?") for p in rows if not p.get("cartoon")]
-    if missing:
-        print(f"Ohne Cartoon: {len(missing)} Spieler")
-        print("Beispiele: "+", ".join(missing[:25]))
+    missing_rows=[p for p in rows if not p.get("cartoon")]
+    missing_with_id=[p for p in missing_rows if p.get("sportsdbId")]
+    missing_without_id=[p for p in missing_rows if not p.get("sportsdbId")]
+
+    print("\n" + "="*62)
+    print("THESPORTSDB / CARTOON-AUSWERTUNG")
+    print("="*62)
+    print(f"Spieler insgesamt:                         {len(rows)}")
+    print(f"Cartoons vorhanden:                       {after}")
+    print(f"Ohne Cartoon:                             {len(missing_rows)}")
+    print(f"  SportsDB-ID vorhanden, aber kein Bild:  {len(missing_with_id)}")
+    print(f"  Kein SportsDB-Treffer / keine ID:       {len(missing_without_id)}")
+    print(f"Neu über Cartoon-Archiv gefunden:         {archive_added}")
+    print(f"Neu über Team-Seiten gefunden:            {team_added}")
+    print(f"Verwendete Namensvarianten:               {alias_hits}")
+    print(f"Verwendete feste SportsDB-ID-Zuordnungen: {id_override_hits}")
+
+    if missing_without_id:
+        print("\nKEIN SPORTSDb-TREFFER – Namensvarianten prüfen:")
+        for p in sorted(missing_without_id, key=lambda x: (-(int(x.get("rating") or 0)), norm(x.get("name")))):
+            print(f" - {p.get('name','?')} | {p.get('club','?')} | OVR {p.get('rating','?')}")
+
+    if missing_with_id:
+        print("\nSPORTSDB-ID VORHANDEN, ABER KEIN CARTOON (erste 40):")
+        for p in sorted(missing_with_id, key=lambda x: (-(int(x.get("rating") or 0)), norm(x.get("name"))))[:40]:
+            print(f" - {p.get('name','?')} | {p.get('club','?')} | ID {p.get('sportsdbId')} | OVR {p.get('rating','?')}")
+    print("="*62)
 
 
 def load_existing():
@@ -511,7 +535,13 @@ def main():
                 old=old_by_ea.get(str(p.get("eaId"))) or old_by_name.get(norm(p["name"])) or {}
                 if key not in merged:
                     rec=dict(old)
+                    # EA-Werte dürfen aktualisiert werden; bereits erfolgreich
+                    # gefundene TheSportsDB-Zuordnungen bleiben aber erhalten.
+                    known_sportsdb={k:old.get(k) for k in ("sportsdbId","sportsdbTeamId","cartoon") if old.get(k)}
                     rec.update(p)
+                    for k,v in known_sportsdb.items():
+                        if not rec.get(k):
+                            rec[k]=v
                     rec["competitions"]=[]
                     merged[key]=rec
                 if comp_id not in merged[key]["competitions"]:
