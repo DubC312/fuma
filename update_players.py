@@ -355,6 +355,8 @@ def rarity(rating):
     return "Bronze"
 
 def sportsdb_enrich(rows):
+    id_override_hits=0
+    alias_hits=0
     """
     V5 Cartoon-Logik:
     1) Vorhandene Cartoons bleiben erhalten.
