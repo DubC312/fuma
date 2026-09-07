@@ -95,8 +95,8 @@
       "teams": [
         {
           "name": "AEK Athens",
-          "ea_url": null,
-          "note": "Keine verifizierte direkte EA-Männerteam-URL hinterlegt; wird übersprungen statt über Suchmaschinen gesucht."
+          "ea_url": "https://www.ea.com/games/ea-sports-fc/ratings/teams-ratings/aek-athens/278",
+          "verified": "2026-09-07"
         },
         {
           "name": "Arsenal",
@@ -223,13 +223,13 @@
         },
         {
           "name": "Shakhtar Donetsk",
-          "ea_url": null,
-          "note": "Keine verifizierte direkte EA-Männerteam-URL hinterlegt; wird übersprungen statt über Suchmaschinen gesucht."
+          "ea_url": "https://www.ea.com/games/ea-sports-fc/ratings/teams-ratings/shakhtar-donetsk/101059",
+          "verified": "2026-09-07"
         },
         {
           "name": "Slavia Praha",
-          "ea_url": null,
-          "note": "Keine verifizierte direkte EA-Männerteam-URL hinterlegt; wird übersprungen statt über Suchmaschinen gesucht."
+          "ea_url": "https://www.ea.com/games/ea-sports-fc/ratings/teams-ratings/slavia-praha/266",
+          "verified": "2026-09-07"
         },
         {
           "name": "Slovan Bratislava",
@@ -416,7 +416,8 @@
         },
         {
           "name": "Union Saint-Gilloise",
-          "ea_url": "https://www.ea.com/games/ea-sports-fc/ratings/teams-ratings/union-saint-gilloise/110724"
+          "ea_url": "https://www.ea.com/games/ea-sports-fc/ratings/teams-ratings/r-union-st-g/2014",
+          "verified": "2026-09-07"
         },
         {
           "name": "Viktoria Plzeň",
@@ -426,6 +427,6 @@
     }
   },
   "ea_url_strategy": "direct_verified_team_pages_v3",
-  "ea_verification_date": "2026-09-03",
+  "ea_verification_date": "2026-09-07",
   "notes": "V3: korrigierte und ergänzte direkte EA FC 27 Teamseiten. Nicht verifizierte Teams bleiben absichtlich ohne URL."
 }

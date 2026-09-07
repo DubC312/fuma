@@ -21,17 +21,6 @@ EA_HOST = "https://www.ea.com"
 EA_RATINGS = f"{EA_HOST}/games/ea-sports-fc/ratings"
 SPORTSDB = "https://www.thesportsdb.com/api/v1/json/123/searchplayers.php?p="
 
-
-# V7.5: zusätzliche von EA bestätigte direkte Teamseiten.
-# Diese Overrides greifen auch dann, wenn competitions.json für das Team
-# noch keine ea_url enthält oder dort eine alte/fehlerhafte URL steht.
-EA_TEAM_URL_OVERRIDES = {
-    "AEK Athens": "https://www.ea.com/games/ea-sports-fc/ratings/teams-ratings/aek-athens/278",
-    "Shakhtar Donetsk": "https://www.ea.com/games/ea-sports-fc/ratings/teams-ratings/shakhtar-donetsk/101059",
-    "Slavia Praha": "https://www.ea.com/games/ea-sports-fc/ratings/teams-ratings/slavia-praha/266",
-    "Union Saint-Gilloise": "https://www.ea.com/games/ea-sports-fc/ratings/teams-ratings/r-union-st-g/2014",
-}
-
 # V5: bekannte Schreibvarianten / verifizierte SportsDB-IDs.
 # Die Keys laufen durch norm(), daher können Akzente/Leerzeichen robust behandelt werden.
 SPORTSDB_NAME_ALIASES = {
@@ -565,9 +554,6 @@ def main():
                 team=team_cfg; ea_url=None
             else:
                 team=team_cfg["name"]; ea_url=team_cfg.get("ea_url")
-            # V7.5: bekannte direkte EA-Teamseite hat Vorrang vor einer
-            # fehlenden oder veralteten URL aus competitions.json.
-            ea_url = EA_TEAM_URL_OVERRIDES.get(team, ea_url)
             try:
                 ps=fetch_team_players(team,n,ea_url)
             except Exception as e:
