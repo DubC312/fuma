@@ -206,6 +206,13 @@ def norm(s: str) -> str:
     s = s.casefold().replace("&","and")
     return re.sub(r"[^a-z0-9]+","",s)
 
+# V7.3: Die Lookup-Tabellen müssen dieselbe Normalisierung verwenden wie
+# Spielernamen. norm("Serhou Guirassy") ergibt z.B. "serhouguirassy".
+# Frühere Versionen speicherten dagegen Schlüssel mit Leerzeichen, wodurch
+# Alias- und ID-Overrides trotz korrekter Einträge nicht gefunden wurden.
+SPORTSDB_NAME_ALIASES = {norm(k): v for k, v in SPORTSDB_NAME_ALIASES.items()}
+SPORTSDB_ID_OVERRIDES = {norm(k): str(v) for k, v in SPORTSDB_ID_OVERRIDES.items()}
+
 def get(url, timeout=30):
     r = SESSION.get(url, timeout=timeout)
     r.raise_for_status()
