@@ -1015,45 +1015,51 @@ function positionDeutsch(pos){
 const teamBadgeCache=new Map();
 
 const CLUB_BADGE_TEAM_IDS={
-  'Paris Saint-Germain':'133714',
-  'PSG':'133714',
-  'Real Madrid':'133738',
-  'AEK Athens':'133753',
-  'AEK Athen':'133753',
-  'PSV Eindhoven':'133768',
-  'PSV':'133768',
-  'Inter Milan':'133681',
-  'Inter':'133681',
-  'Sturm Graz':'137743'
+  "1. FC Köln":"133654",
+  "1. FC Union Berlin":"134690",
+  "1. FSV Mainz 05":"133665",
+  "Bayer 04 Leverkusen":"133666",
+  "Borussia Dortmund":"133650",
+  "Borussia Mönchengladbach":"134779",
+  "Eintracht Frankfurt":"133814",
+  "FC Augsburg":"133652",
+  "FC Bayern München":"133664",
+  "FC Schalke 04":"133661",
+  "Hamburger SV":"133651",
+  "RB Leipzig":"134695",
+  "SC Freiburg":"133653",
+  "SC Paderborn 07":"134551",
+  "SV Elversberg":"138411",
+  "SV Werder Bremen":"133662",
+  "TSG Hoffenheim":"133657",
+  "VfB Stuttgart":"133660",
+  "Paris Saint-Germain":"133714",
+  "PSG":"133714",
+  "Real Madrid":"133738",
+  "AEK Athens":"133753",
+  "AEK Athen":"133753",
+  "PSV Eindhoven":"133768",
+  "PSV":"133768",
+  "Inter Milan":"133681",
+  "Inter":"133681",
+  "Sturm Graz":"137743"
 };
-
 const CLUB_SEARCH_NAMES={
-  'PSG':'Paris Saint-Germain',
-  'AEK Athen':'AEK Athens',
-  'PSV':'PSV Eindhoven',
-  'Inter':'Inter Milan'
+  'PSG':'Paris Saint-Germain','AEK Athen':'AEK Athens',
+  'PSV':'PSV Eindhoven','Inter':'Inter Milan'
 };
-
-function normTeamName(s){
-  return String(s||'')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g,'')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g,'');
-}
-
+  
 async function teamBadge(club){
   club=String(club||'').trim();
   if(!club) return '';
 
-  const cacheKey=club.toLowerCase();
-  if(teamBadgeCache.has(cacheKey)) return teamBadgeCache.get(cacheKey);
+  const key=club.toLowerCase();
+  if(teamBadgeCache.has(key)) return teamBadgeCache.get(key);
 
   const promise=(async()=>{
     try{
       const fixedId=CLUB_BADGE_TEAM_IDS[club]||'';
 
-      // Problemvereine direkt über die verifizierte Team-ID laden.
       if(fixedId){
         const res=await fetch(
           'https://www.thesportsdb.com/api/v1/json/123/lookupteam.php?id='+
@@ -1061,31 +1067,36 @@ async function teamBadge(club){
         );
         if(!res.ok) return '';
         const data=await res.json();
-        const teams=Array.isArray(data.teams)?data.teams:[];
-        return teams[0]?.strBadge||'';
+        const team=Array.isArray(data.teams)?data.teams[0]:null;
+
+        // Zusätzliche Sicherheit: nur Fußball-Wappen akzeptieren.
+        if(!team || String(team.strSport||'').toLowerCase()!=='soccer') return '';
+        return team.strBadge||'';
       }
 
-      // Alle anderen Vereine über den Vereinsnamen suchen.
+      // Für noch nicht fest hinterlegte Vereine bleibt eine vorsichtige Namenssuche.
       const searchName=CLUB_SEARCH_NAMES[club]||club;
       const res=await fetch(
         'https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t='+
         encodeURIComponent(searchName)
       );
       if(!res.ok) return '';
-
       const data=await res.json();
       const teams=Array.isArray(data.teams)?data.teams:[];
-
-      // Nur exakten Namens-Treffer verwenden.
-      const wanted=normTeamName(searchName);
-      const exact=teams.find(t=>normTeamName(t.strTeam)===wanted);
+      const norm=s=>String(s||'').normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g,'').toLowerCase()
+        .replace(/[^a-z0-9]/g,'');
+      const exact=teams.find(t=>
+        String(t.strSport||'').toLowerCase()==='soccer' &&
+        norm(t.strTeam)===norm(searchName)
+      );
       return exact?.strBadge||'';
     }catch(e){
       return '';
     }
   })();
 
-  teamBadgeCache.set(cacheKey,promise);
+  teamBadgeCache.set(key,promise);
   return promise;
 }
 
@@ -1199,11 +1210,9 @@ function appendClubSections(parent,list){
       section.appendChild(grid);
 
       let rendered=false;
-
-      const renderClubCards=()=>{
+      function renderClub(){
         if(rendered) return;
         rendered=true;
-
         clubPlayers
           .slice()
           .sort((a,b)=>(b.rating||0)-(a.rating||0)||a.name.localeCompare(b.name,'de'))
@@ -1217,10 +1226,10 @@ function appendClubSections(parent,list){
               grid.appendChild(lockedWrap);
             }
           });
-      };
+      }
 
       section.addEventListener('toggle',()=>{
-        if(section.open) renderClubCards();
+        if(section.open) renderClub();
       });
 
       parent.appendChild(section);
