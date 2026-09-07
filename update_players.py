@@ -48,6 +48,13 @@ SPORTSDB_NAME_ALIASES = {
     "andre franck zambo anguissa": "Andre-Frank Zambo Anguissa",
     "moleiro": "Alberto Moleiro",
     "juan foyth": "Juan Marcos Foyth",
+    "oyarzabal": "Mikel Oyarzabal",
+    "guedes": "Gonçalo Guedes",
+    "rafa": "Rafa Silva",
+    "reinildo": "Reinildo Mandava",
+    "samu": "Samu Omorodion",
+    "nick d'agostino": "Nicholas D'Agostino",
+    "neymar jr": "Neymar",
 }
 SPORTSDB_ID_OVERRIDES = {
     # Verifizierte TheSportsDB-Spieler-IDs
@@ -90,6 +97,15 @@ SPORTSDB_ID_OVERRIDES = {
     "raphael obermair": "34215613",
     "rodri": "34163415",
     "pedri": "34172243",
+    "oyarzabal": "34161387",
+    "alex scott": "34192695",
+    "guedes": "34146537",
+    "rafa": "34168935",
+    "reinildo": "34173328",
+    "samu": "34220051",
+    "ewandro": "34164442",
+    "nick d'agostino": "34164598",
+    "neymar jr": "34146371",
 }
 
 def sportsdb_search_name(name):
