@@ -1015,42 +1015,77 @@ function positionDeutsch(pos){
 const teamBadgeCache=new Map();
 
 const CLUB_BADGE_TEAM_IDS={
-  'Paris Saint-Germain':'133714','PSG':'133714',
+  'Paris Saint-Germain':'133714',
+  'PSG':'133714',
   'Real Madrid':'133738',
-  'AEK Athens':'133753','AEK Athen':'133753',
-  'PSV Eindhoven':'133768','PSV':'133768',
-  'Inter Milan':'133681','Inter':'133681',
+  'AEK Athens':'133753',
+  'AEK Athen':'133753',
+  'PSV Eindhoven':'133768',
+  'PSV':'133768',
+  'Inter Milan':'133681',
+  'Inter':'133681',
   'Sturm Graz':'137743'
 };
+
 const CLUB_SEARCH_NAMES={
-  'PSG':'Paris Saint-Germain','AEK Athen':'AEK Athens',
-  'PSV':'PSV Eindhoven','Inter':'Inter Milan'
+  'PSG':'Paris Saint-Germain',
+  'AEK Athen':'AEK Athens',
+  'PSV':'PSV Eindhoven',
+  'Inter':'Inter Milan'
 };
-  
+
+function normTeamName(s){
+  return String(s||'')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g,'');
+}
+
 async function teamBadge(club){
   club=String(club||'').trim();
   if(!club) return '';
-  const key=club.toLowerCase();
-  if(teamBadgeCache.has(key)) return teamBadgeCache.get(key);
+
+  const cacheKey=club.toLowerCase();
+  if(teamBadgeCache.has(cacheKey)) return teamBadgeCache.get(cacheKey);
+
   const promise=(async()=>{
     try{
+      const fixedId=CLUB_BADGE_TEAM_IDS[club]||'';
+
+      // Problemvereine direkt über die verifizierte Team-ID laden.
+      if(fixedId){
+        const res=await fetch(
+          'https://www.thesportsdb.com/api/v1/json/123/lookupteam.php?id='+
+          encodeURIComponent(fixedId)
+        );
+        if(!res.ok) return '';
+        const data=await res.json();
+        const teams=Array.isArray(data.teams)?data.teams:[];
+        return teams[0]?.strBadge||'';
+      }
+
+      // Alle anderen Vereine über den Vereinsnamen suchen.
       const searchName=CLUB_SEARCH_NAMES[club]||club;
-      const expectedId=CLUB_BADGE_TEAM_IDS[club]||'';
-      const res=await fetch('https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t='+encodeURIComponent(searchName));
+      const res=await fetch(
+        'https://www.thesportsdb.com/api/v1/json/123/searchteams.php?t='+
+        encodeURIComponent(searchName)
+      );
       if(!res.ok) return '';
+
       const data=await res.json();
       const teams=Array.isArray(data.teams)?data.teams:[];
-      if(expectedId){
-        const exact=teams.find(t=>String(t.idTeam||'')===expectedId);
-        return exact?.strBadge||'';
-      }
-      const norm=s=>String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
-      const exact=teams.find(t=>norm(t.strTeam)===norm(searchName));
+
+      // Nur exakten Namens-Treffer verwenden.
+      const wanted=normTeamName(searchName);
+      const exact=teams.find(t=>normTeamName(t.strTeam)===wanted);
       return exact?.strBadge||'';
-    }catch(e){ return ''; }
+    }catch(e){
+      return '';
+    }
   })();
 
-  teamBadgeCache.set(key,promise);
+  teamBadgeCache.set(cacheKey,promise);
   return promise;
 }
 
@@ -1161,22 +1196,33 @@ function appendClubSections(parent,list){
 
       const grid=document.createElement('div');
       grid.className='club-grid';
-
-      clubPlayers
-        .slice()
-        .sort((a,b)=>(b.rating||0)-(a.rating||0)||a.name.localeCompare(b.name,'de'))
-        .forEach(p=>{
-          if(owned.includes(p.id)){
-            grid.appendChild(card(p));
-          }else{
-            const lockedWrap=document.createElement('div');
-            lockedWrap.className='locked-card-wrap';
-            lockedWrap.appendChild(card(p));
-            grid.appendChild(lockedWrap);
-          }
-        });
-
       section.appendChild(grid);
+
+      let rendered=false;
+
+      const renderClubCards=()=>{
+        if(rendered) return;
+        rendered=true;
+
+        clubPlayers
+          .slice()
+          .sort((a,b)=>(b.rating||0)-(a.rating||0)||a.name.localeCompare(b.name,'de'))
+          .forEach(p=>{
+            if(owned.includes(p.id)){
+              grid.appendChild(card(p));
+            }else{
+              const lockedWrap=document.createElement('div');
+              lockedWrap.className='locked-card-wrap';
+              lockedWrap.appendChild(card(p));
+              grid.appendChild(lockedWrap);
+            }
+          });
+      };
+
+      section.addEventListener('toggle',()=>{
+        if(section.open) renderClubCards();
+      });
+
       parent.appendChild(section);
     });
 }
