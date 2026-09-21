@@ -307,6 +307,11 @@ def row_player(row, canonical_team):
     for token in re.findall(r"\b[A-Z]{2,3}\b", text):
         if token in POSITION_SET:
             pos=token; break
+    # EA hängt teilweise die Position an den sichtbaren Spielernamen
+    # (z.B. "Harry Kane ST"). "pos" ist bereits ein eigenes Feld.
+    if pos:
+        name = re.sub(r"\\s+" + re.escape(pos) + r"$", "", name, flags=re.I).strip()
+
     m = re.search(r"/player-ratings/[^/]+/(\d+)", href)
     ea_id = m.group(1) if m else ""
     return {
@@ -601,8 +606,12 @@ def main():
     # Sicherheitsnetz: Wenn eine EA-Seite vorübergehend ausfällt, vorhandene
     # automatische Spieler NICHT aus players.json löschen.
     present_names={norm(x.get("name")) for x in merged.values()}
+    present_ea={str(x.get("eaId")) for x in merged.values() if x.get("eaId")}
     for old in existing:
         if old.get("manual") is True:
+            continue
+        # Gleiche EA-ID = gleicher Spieler, auch wenn EA den Namen anders formatiert.
+        if old.get("eaId") and str(old.get("eaId")) in present_ea:
             continue
         if norm(old.get("name")) not in present_names:
             merged[("preserved",str(old.get("id") or norm(old.get("name"))))]=dict(old)
